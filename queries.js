@@ -140,3 +140,29 @@ db.books.find().skip(0).limit(5)
 
 // Task 4
 //(A)
+db.books.aggregate([
+  { $group: { _id: "$genre", avgPrice: { $avg: "$price" } } }
+])
+
+//(B)
+db.books.aggregate([
+  { $group: { _id: "$author", count: { $sum: 1 } } },
+  { $sort: { count: -1 } },
+  { $limit: 1 }
+])
+
+//(C)
+db.books.aggregate([
+  { $project: { decade: { $subtract: [ { $divide: ["$published_year", 10] }, { $mod: [ { $divide: ["$published_year", 10] }, 1 ] } ] } } },
+  { $group: { _id: "$decade", totalBooks: { $sum: 1 } } }
+])
+
+//Task 5
+//(A)
+db.books.createIndex({ title: 1 })
+
+//(B)
+db.books.createIndex({ author: 1, published_year: -1 })
+
+//(C)
+db.books.find({ title: "The Hobbit" }).explain("executionStats")
